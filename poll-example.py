@@ -57,10 +57,10 @@ async def poll(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Sends a predefined poll"""
     options = ["sea bisquit", "pizza", "potato", "shawarma"]
     message = await context.bot.send_poll(
-        chat_id='@testMerengueGroup',  # update.effective_chat.id,
+        chat_id=update.effective_chat.id, #'@testMerengueChannel', # '@testMerengueGroup',
         options=options,
         question="What producs do you like?",
-        is_anonymous=False,
+        is_anonymous=True,
         allows_multiple_answers=False,
     )
     # Save some info about the poll the bot_data for later use in receive_poll_answer
@@ -72,13 +72,16 @@ async def poll(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             "answers": 0,
         }
     }
+    print(vars(payload))
     context.bot_data.update(payload)
 
 
 async def receive_poll_answer(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Summarize a users poll vote"""
+    print('receive_poll_answer')
     answer = update.poll_answer
     answered_poll = context.bot_data[answer.poll_id]
+    print(answered_poll["chat_id"])
     try:
         questions = answered_poll["questions"]
     # this means this poll answer update is from an old poll, we can't do our answering then
@@ -142,6 +145,7 @@ async def preview(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def receive_poll(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """On receiving polls, reply to it by a closed poll copying the received poll"""
+    print('receiving polls')
     actual_poll = update.effective_message.poll
     # Only need to set the question and options, since all other parameters don't matter for
     # a closed poll
